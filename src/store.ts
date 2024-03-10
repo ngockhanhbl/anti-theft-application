@@ -56,34 +56,43 @@ const store = createStore({
     togglePowerReady (state) {
         state.powerReady = !state.powerReady;
     },
+    setErrorToggleCode(state, payload: number) {
+      state.errorToggleCode = payload;
+    }
 
   },
   actions: {
     togglePowerMode (context) {
+      console.log("this.state.powerMode", this.state.powerMode);
+      console.log("this.state.powerReady", this.state.powerReady);
       if(this.state.powerMode || this.state.powerReady) {
         context.commit('togglePowerMode')
       } else {
-        this.state.errorToggleCode = 1
+        context.commit('setErrorToggleCode', 1);
       }
     },
     toggleHeadsetMode (context) {
         if(this.state.headsetMode || this.state.headsetReady) {
             context.commit('toggleHeadsetMode')
         } else {
-            this.state.errorToggleCode = 2
+            context.commit('setErrorToggleCode', 2);
         }
     },
     toggleLocationMode (context) {
         if(this.state.locationMode || this.state.locationReady) {
             context.commit('toggleLocationMode')
         } else {
-            this.state.errorToggleCode = 3
+          context.commit('setErrorToggleCode', 3);
         }
+    },
+    resetToggleCode (context) {
+      context.commit('setErrorToggleCode', 0);
     },
     togglePowerReady (context) {
       context.commit('togglePowerReady')
     },
     toggleHeadsetReady (context) {
+        console.log("toggleHeadsetReady ne");
         context.commit('toggleHeadsetReady')
     },
     toggleLocationReady (context) {

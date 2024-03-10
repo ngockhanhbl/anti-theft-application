@@ -1,6 +1,6 @@
 <template>
     <TransitionRoot as="template" :show="open">
-      <Dialog as="div" class="relative z-10" @close="open = false">
+      <Dialog as="div" class="relative z-10" @close="closeFunc">
         <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
           <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
         </TransitionChild>
@@ -15,16 +15,16 @@
                       <ExclamationTriangleIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
                     </div>
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                      <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Deactivate account</DialogTitle>
+                      <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">{{error?.title ?? 'Error'}}</DialogTitle>
                       <div class="mt-2">
-                        <p class="text-sm text-gray-500">Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.</p>
+                        <p class="text-sm text-gray-500">{{error?.msg ?? ''}}</p>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                  <button type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto" @click="open = false">Deactivate</button>
-                  <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" @click="open = false" ref="cancelButtonRef">Cancel</button>
+                  <!-- <button type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto" @click="open = false">Deactivate</button> -->
+                  <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" @click="closeFunc" ref="cancelButtonRef">Cancel</button>
                 </div>
               </DialogPanel>
             </TransitionChild>
@@ -40,27 +40,29 @@
   import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
   import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 
-  const open = ref(true);
+  const open = ref(false);
   const store = useStore();
+
+  function closeFunc() {
+    open.value = false;
+    setTimeout(() => {
+      store.dispatch("resetToggleCode")
+    }, 500)
+  }
 
   const errorToggleCode = computed(() => {
     return store.getters.getErrorToggleCode;
   });
 
-  const error = computed(() => {
-    if ([1,2,3].includes(errorToggleCode)) {
-        return errors[errorToggleCode]
-    }
-    return null;
-  });
+  // const error = computed(() => {
+  //   console.log('here', [1,2,3].includes(errorToggleCode.value));
+  //   if ([1,2,3].includes(errorToggleCode.value)) {
+  //       return errors[errorToggleCode.value]
+  //   }
+  //   return null;
+  // });
 
-  watch(errorToggleCode, async (newVal, oldVal) => {
-    if ([1,2,3].includes(newVal)) {
-        open.value = true
-    } else {
-        open.value = false
-    }
- })
+
 
   const errors = ref([
     {
@@ -79,6 +81,18 @@
         msg: 'Please allow Anti Theft use your location'
     },
   ])
+
+  const error = ref(errors.value[0]);
+
+  watch(errorToggleCode, async (newVal, oldVal) => {
+    if ([1,2,3].includes(newVal)) {
+        open.value = true
+        error.value = errors.value[newVal-1];
+    } else {
+        open.value = false
+        error.value = null;
+    }
+  })
 
 
   </script>

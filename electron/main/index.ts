@@ -1,10 +1,11 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, powerMonitor } from 'electron'
 import { release } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 globalThis.__filename = fileURLToPath(import.meta.url)
 globalThis.__dirname = dirname(__filename)
+
 
 // The built directory structure
 //
@@ -53,7 +54,7 @@ async function createWindow() {
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
-      // nodeIntegration: true,
+      nodeIntegration: true,
 
       // Consider using contextBridge.exposeInMainWorld
       // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
@@ -82,7 +83,39 @@ async function createWindow() {
   // win.webContents.on('will-navigate', (event, url) => { }) #344
 }
 
-app.whenReady().then(createWindow)
+
+app.on('ready', () => {
+  console.log("READY ROI NE");
+  console.log(powerMonitor);
+  powerMonitor.on('suspend', () => {
+    console.log('The system is going to sleep')
+  })
+  powerMonitor.on('resume', () => { 
+    console.log('The system is resuming'); 
+}); 
+
+powerMonitor.on('on-ac', () => { 
+    console.log('The system is on AC Power (charging)'); 
+    win?.webContents.send('on-ac', true)
+}); 
+  
+powerMonitor.on('on-battery', () => { 
+    console.log('The system is on Battery Power'); 
+}); 
+  
+powerMonitor.on('shutdown', () => { 
+    console.log('The system is Shutting Down'); 
+}); 
+  
+powerMonitor.on('lock-screen', () => { 
+    console.log('The system is about to be locked'); 
+}); 
+  
+powerMonitor.on('unlock-screen', () => { 
+    console.log('The system is unlocked'); 
+}); 
+  createWindow()
+})
 
 app.on('window-all-closed', () => {
   win = null
@@ -104,6 +137,13 @@ app.on('activate', () => {
   } else {
     createWindow()
   }
+})
+
+ipcMain.handle('power', (_, arg) => {
+  console.log('main recived arg');
+  console.log(arg);
+  console.log(_);
+  console.log('main recived arg end');
 })
 
 // New window example arg: new windows url
