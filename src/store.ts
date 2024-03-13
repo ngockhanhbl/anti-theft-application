@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-
+import {ErrorToggleCodeEnum, DetectTheftEnum} from '../src/utils/constants';
 const store = createStore({
   state: {
     powerMode: false,
@@ -10,7 +10,9 @@ const store = createStore({
     headsetReady: false,
     locationReady: false,
 
-    errorToggleCode: 0,
+    errorToggleCode: ErrorToggleCodeEnum.None,
+    detectTheft: DetectTheftEnum.None,
+    visibleConfirmPasswordModal: false,
   },
   getters: {
     getPowerMode (state): boolean {
@@ -34,11 +36,21 @@ const store = createStore({
     },
     getErrorToggleCode (state): number {
         return state.errorToggleCode;
-    }
+    },
+    getDetectTheft (state): DetectTheftEnum {
+      return state.detectTheft;
+    },
+    getVisibleConfirmPasswordModal (state): boolean {
+      return state.visibleConfirmPasswordModal;
+    },
   },
   mutations: {
-    togglePowerMode (state) {
-      state.powerMode = !state.powerMode;
+    togglePowerMode (state, payload) {
+      if (payload == null) {
+        state.powerMode = !state.powerMode;
+      } else {
+        state.powerMode = payload;
+      }
     },
     toggleHeadsetMode (state) {
         state.headsetMode = !state.headsetMode;
@@ -56,38 +68,56 @@ const store = createStore({
     togglePowerReady (state) {
         state.powerReady = !state.powerReady;
     },
-    setErrorToggleCode(state, payload: number) {
+    setErrorToggleCode(state, payload: ErrorToggleCodeEnum) {
       state.errorToggleCode = payload;
-    }
+    },
+    setPowerReady(state, payload: boolean) {
+      state.powerReady = payload;
+    },
+    setDetectTheft(state, payload: DetectTheftEnum) {
+      state.detectTheft = payload;
+    },
+    setVisibleConfirmPasswordModal(state, payload: boolean) {
+      state.visibleConfirmPasswordModal = payload;
+    },
 
   },
   actions: {
-    togglePowerMode (context) {
-      console.log("this.state.powerMode", this.state.powerMode);
-      console.log("this.state.powerReady", this.state.powerReady);
+    togglePowerMode (context, payload) {
       if(this.state.powerMode || this.state.powerReady) {
-        context.commit('togglePowerMode')
+        context.commit('togglePowerMode', payload)
       } else {
-        context.commit('setErrorToggleCode', 1);
+        context.commit('setErrorToggleCode', ErrorToggleCodeEnum.PowerErr);
       }
     },
     toggleHeadsetMode (context) {
         if(this.state.headsetMode || this.state.headsetReady) {
             context.commit('toggleHeadsetMode')
         } else {
-            context.commit('setErrorToggleCode', 2);
+            context.commit('setErrorToggleCode', ErrorToggleCodeEnum.HeadsetErr);
         }
     },
     toggleLocationMode (context) {
         if(this.state.locationMode || this.state.locationReady) {
             context.commit('toggleLocationMode')
         } else {
-          context.commit('setErrorToggleCode', 3);
+          context.commit('setErrorToggleCode', ErrorToggleCodeEnum.LocationErr);
         }
     },
+
     resetToggleCode (context) {
-      context.commit('setErrorToggleCode', 0);
+      context.commit('setErrorToggleCode', ErrorToggleCodeEnum.None);
     },
+    setPowerReady (context, payload: boolean) {
+      context.commit('setPowerReady', payload);
+    },
+    setDetectTheft (context, payload: DetectTheftEnum) {
+      context.commit('setDetectTheft', payload);
+    },
+    setVisibleConfirmPasswordModal (context, payload: boolean) {
+      context.commit('setVisibleConfirmPasswordModal', payload);
+    },
+
     togglePowerReady (context) {
       context.commit('togglePowerReady')
     },

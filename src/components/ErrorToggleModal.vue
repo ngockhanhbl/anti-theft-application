@@ -39,6 +39,7 @@
   import { useStore } from 'vuex';
   import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
   import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
+  import {ErrorToggleCodeEnum, getErrorToggleCodeEnumList} from '../utils/constants';
 
   const open = ref(false);
   const store = useStore();
@@ -47,47 +48,42 @@
     open.value = false;
     setTimeout(() => {
       store.dispatch("resetToggleCode")
-    }, 500)
+    }, 200)
   }
 
-  const errorToggleCode = computed(() => {
-    return store.getters.getErrorToggleCode;
-  });
-
-  // const error = computed(() => {
-  //   console.log('here', [1,2,3].includes(errorToggleCode.value));
-  //   if ([1,2,3].includes(errorToggleCode.value)) {
-  //       return errors[errorToggleCode.value]
-  //   }
-  //   return null;
+  // const errorToggleCode = computed(() => {
+  //   return store.getters.getErrorToggleCode;
   // });
-
-
 
   const errors = ref([
     {
-        code: 1,
+        code: ErrorToggleCodeEnum.PowerErr,
         title: 'Toggle Power Detect Fail',
         msg: 'Your device is in an uncharged state. Please plug in the charger to use this function'
     },
     {
-        code: 2,
+        code: ErrorToggleCodeEnum.HeadsetErr,
         title: 'Toggle Headset Detect Fail',
         msg: 'You have not plugged the headset into the device. Please plug Headset to use this function'
     },
     {
-        code: 3,
+        code: ErrorToggleCodeEnum.LocationErr,
         title: 'Toggle Location Detect Fail',
         msg: 'Please allow Anti Theft use your location'
     },
   ])
 
-  const error = ref(errors.value[0]);
+  const error = ref<object | null>(errors.value[0]);
 
-  watch(errorToggleCode, async (newVal, oldVal) => {
-    if ([1,2,3].includes(newVal)) {
-        open.value = true
-        error.value = errors.value[newVal-1];
+  watch(() => store.getters.getErrorToggleCode, async (newVal, oldVal) => {
+    console.log("newVal, ", newVal)
+    console.log(getErrorToggleCodeEnumList().includes(newVal))
+    if (getErrorToggleCodeEnumList().includes(newVal)) {
+        let e = errors.value.find((x) => x.code === newVal);
+        if (e) {
+          open.value = true
+          error.value = {...e};
+        }
     } else {
         open.value = false
         error.value = null;

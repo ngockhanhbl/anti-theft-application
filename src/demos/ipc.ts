@@ -6,12 +6,12 @@ window.ipcRenderer.on('main-process-message', (_event, ...args) => {
 
 window.ipcRenderer.on('on-ac', (_event, ...args) => {
   console.log('[Receive on-ac]:', ...args)
+  store.commit("setPowerReady", ...args)
 })
 
 
-
 setTimeout(() => {
-  console.log(store);
-  store.commit("togglePowerMode")
+  // console.log(store);
+  // store.commit("togglePowerMode")
   store.state.powerMode;
 }, 5000)

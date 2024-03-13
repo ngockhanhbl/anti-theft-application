@@ -1,27 +1,63 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue';
+import CreatePasswordModal from './components/CreatePasswordModal.vue';
+import ConfirmPasswordModal from './components/ConfirmPasswordModal.vue';
+import {DetectTheftEnum} from './utils/constants';
+
 import { ref, watch, computed } from 'vue'
 import { useStore } from 'vuex';
 
 const store = useStore()
 
-const powerMode:boolean = computed(() => {
+const powerMode = computed(() => {
   return store.getters.getPowerMode;
 });
 
 const headsetMode = computed(() => {
   return store.getters.getHeadsetMode;
 })
+
 const locationMode = computed(() => {
   return store.getters.getLocationMode;
 })
 
-watch(powerMode, async (newVal, oldVal) => {
-  console.log(newVal);
-  if (newVal) {
+// setTimeout(() => {
+//   console.log("starting setVisibleConfirmPassword");
+//   store.dispatch("setVisibleConfirmPasswordModal", true);
+// }, 5000);
 
+function playAudio() {
+  //HTMLVideoElement
+  document.getElementById("myAudio")?.play();
+}
+function stopAudio() {
+  document.getElementById("myAudio")?.pause();
+}
+
+
+watch(() => store.getters.getPowerReady, async (newVal, oldVal) => {
+  console.log("powerReady", newVal)
+  console.log("powerMode", powerMode.value)
+  if (!newVal && powerMode.value) {
+    store.dispatch("setDetectTheft", DetectTheftEnum.Power);
   }
 })
+
+watch(() => store.getters.getDetectTheft, async (newVal, oldVal) => {
+  console.log("detectTheft", newVal)
+  console.log("DetectTheftEnum.None.valueOf", DetectTheftEnum.None.valueOf())
+  if (newVal !== DetectTheftEnum.None.valueOf()) {
+    // play audio
+    playAudio();
+    // show pop-up
+    store.dispatch("setVisibleConfirmPasswordModal", true);
+
+    // TODO write log to db. thoi gian - phuong thuc (10 lan gan nhat).
+  } else {
+    stopAudio();
+  }
+})
+
 </script>
 
 <template>
@@ -38,6 +74,12 @@ watch(powerMode, async (newVal, oldVal) => {
   </div> -->
   <div class="main">
     <HelloWorld msg="Electron + Vite + Vue" />
+    <CreatePasswordModal />
+    <ConfirmPasswordModal />
+    <audio id="myAudio" controls loop preload="none" hidden>
+      <source src="./assets/audio/audio.mp3" type="audio/mpeg">
+      <source src="./assets/audio/audio.ogg" type="audio/ogg" />
+    </audio>
   </div>
   <!-- <div class="flex-center">
     Place static files into the <code>/public</code> folder

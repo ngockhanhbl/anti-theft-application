@@ -7,6 +7,9 @@ globalThis.__filename = fileURLToPath(import.meta.url)
 globalThis.__dirname = dirname(__filename)
 
 
+
+
+
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -73,6 +76,7 @@ async function createWindow() {
   // Test actively push message to the Electron-Renderer
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
+    win?.webContents.send('on-ac', !powerMonitor.isOnBatteryPower())
   })
 
   // Make all links open with the browser, not with the application
@@ -92,28 +96,29 @@ app.on('ready', () => {
   })
   powerMonitor.on('resume', () => { 
     console.log('The system is resuming'); 
-}); 
+  }); 
 
-powerMonitor.on('on-ac', () => { 
-    console.log('The system is on AC Power (charging)'); 
-    win?.webContents.send('on-ac', true)
-}); 
-  
-powerMonitor.on('on-battery', () => { 
-    console.log('The system is on Battery Power'); 
-}); 
-  
-powerMonitor.on('shutdown', () => { 
-    console.log('The system is Shutting Down'); 
-}); 
-  
-powerMonitor.on('lock-screen', () => { 
-    console.log('The system is about to be locked'); 
-}); 
-  
-powerMonitor.on('unlock-screen', () => { 
-    console.log('The system is unlocked'); 
-}); 
+  powerMonitor.on('on-ac', () => { 
+      console.log('The system is on AC Power (charging)'); 
+      win?.webContents.send('on-ac', true)
+  }); 
+    
+  powerMonitor.on('on-battery', () => { 
+      console.log('The system is on Battery Power');
+      win?.webContents.send('on-ac', false)
+  }); 
+    
+  powerMonitor.on('shutdown', () => { 
+      console.log('The system is Shutting Down'); 
+  }); 
+    
+  powerMonitor.on('lock-screen', () => { 
+      console.log('The system is about to be locked'); 
+  }); 
+    
+  powerMonitor.on('unlock-screen', () => { 
+      console.log('The system is unlocked'); 
+  }); 
   createWindow()
 })
 
