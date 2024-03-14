@@ -88,3 +88,37 @@ code {
     background-color: #f9f9f9;
   }
 }
+
+
+.border-width  {
+  border-width : 1px;
+}
+.border-sky-300 {
+  border-color: rgb(125 211 252);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+.relative {
+  position: relative;
+}
+.w-11	{
+  width: 2.75rem;
+}
+.h-6	{
+  height: 1.5rem;
+}
+.bg-gray-200	{
+  background-color: rgb(229 231 235);
+}
+.ring-blue-800 {
+  color: rgb(30 64 175)
+}

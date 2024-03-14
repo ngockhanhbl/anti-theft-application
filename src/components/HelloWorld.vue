@@ -56,70 +56,66 @@ watch(() => store.getters.getLocationMode, async (newVal, oldVal) => {
 </script>
 
 <template>
-<div class="w-full">
-  errorToggleCode:{{ errorToggleCode }} || headset:{{ headsetMode }} |headset {{ powerready }}
-  <div class="flex justify-between">
-    <div class="option-card rounded border border-sky-300" id="headset-card">
-      <div class="h-full p-2 flex flex-col justify-between">
-        <div>
-          <div class="flex pb-2 justify-between">
-            <span class="font-medium text-white">Power Detector</span>
-            <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox"
-                v-model="powerMode"
-                @click="togglePowerMode"
-                class="sr-only peer"
-              />
-              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-            </label>
+<div class="w-100">
+  <div class="d-flex justify-space-between">
+    <div class="option-card rounded border-width  border-sky-300" >
+      <div class="h-100 d-flex px-2 flex-column justify-space-between">
+          <div class="d-flex pb-2 align-center justify-space-between">
+            <span class="font-weight-medium text-white">Power Detector</span>
+            <v-switch
+              v-model="powerMode"
+              label=""
+              hide-details
+              inset
+              color="blue-accent-4"
+              @click="togglePowerMode"
+            ></v-switch>
           </div>
-        </div>
-        <img src="../assets/energetic.svg" class="main-icon" alt="Electron logo" />
-        <div>
+        <img src="../assets/energetic.svg" class="main-icon  py-2" alt="Electron logo" />
+        <div class="py-2">
           <p class="text-white des">An alarm sounds when the power cord is unplugged.</p>
         </div>
       </div>
     </div>
-    <div class="option-card rounded border border-sky-300" id="headset-card">
-      <div class="h-full p-2 flex flex-col justify-between">
+    <div class="option-card rounded border-width border-sky-300" >
+      <div class="h-100 px-2 d-flex flex-column justify-space-between">
         <div>
-          <div class="flex pb-2 justify-between">
-            <!-- <img src="../assets/headset.svg" class="icon mr-2" alt="Electron logo" /> -->
-            <span class="font-medium text-white">Headset Detector</span>
-            <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox"
-                v-model="headsetMode"
-                @click="toggleHeadsetMode"
-                class="sr-only peer"
-              />
-              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-            </label>
+          <div class="d-flex pb-2 align-center justify-space-between">
+            <span class="font-weight-medium text-white">Headset Detector</span>
+            <v-switch
+              v-model="headsetMode"
+              label=""
+              hide-details
+              inset
+              color="blue-accent-4"
+              @click="toggleHeadsetMode"
+            ></v-switch>
           </div>
         </div>
-        <img src="../assets/headset.svg" class="main-icon" alt="Electron logo" />
-        <div>
-          <p class="text-white des">An alarm sounds when the headset is removed.</p>
+        <img src="../assets/headset.svg" class="main-icon py-2" alt="Electron logo" />
+        <div class="py-2">
+          <p class="text-white des ">An alarm sounds when the headset is removed.</p>
         </div>
       </div>
     </div>
-    <div class="option-card rounded border border-sky-300" id="headset-card">
-      <div class="h-full p-2 flex flex-col justify-between">
+
+    <div class="option-card rounded border-width border-sky-300" >
+      <div class="h-100 px-2 d-flex flex-column justify-space-between">
         <div>
-          <div class="flex pb-2 justify-between">
-            <!-- <img src="../assets/headset.svg" class="icon mr-2" alt="Electron logo" /> -->
-            <span class="font-medium text-white">Location Detector</span>
-            <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox"
-                v-model="locationMode"
-                @click="toggleLocationMode"
-                class="sr-only peer"
-              />
-              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-            </label>
+          <div class="d-flex pb-2 align-center justify-space-between">
+            <span class="font-weight-medium text-white">Location Detector</span>
+            <v-switch
+              v-model="locationMode"
+              label=""
+              hide-details
+              inset
+              color="blue-accent-4"
+              @click="toggleLocationMode"
+            ></v-switch>
           </div>
         </div>
-        <img src="../assets/direction.svg" class="main-icon" alt="Electron logo" />
-        <div>
+        <img src="../assets/direction.svg" class="main-icon  py-2 " alt="Electron logo" />
+        <div class=" py-2 ">
           <p class="text-white des">An alarm sounds  when the laptop is moved.</p>
         </div>
       </div>
@@ -138,6 +134,7 @@ watch(() => store.getters.getLocationMode, async (newVal, oldVal) => {
 .option-card {
   width: 280px;
   height: 200px;
+  background: url('../assets/pattern-1.jpg');
 }
 .icon {
   width: 24px;
@@ -150,18 +147,5 @@ watch(() => store.getters.getLocationMode, async (newVal, oldVal) => {
   font-size: 14px;
   text-align: center;
 }
-.box-container {
-  
-}
-#power-card{
-  background: url('../assets/pattern-1.jpg');
-}
-#headset-card{
-  background: url('../assets/pattern-2.png');
-  background: url('../assets/pattern-1.jpg');
 
-}
-#location-card{
-  background: url('../assets/pattern-1.jpg');
-}
 </style>
