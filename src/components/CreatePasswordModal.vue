@@ -11,12 +11,17 @@
       >
       <v-card-text>
         <v-text-field
-         :rule="rules"
+         :rules="[required]"
           hide-details="auto"
           label="Password"
           v-model="password"
         ></v-text-field>
-        <input type="text" placeholder="Confirm Password"  v-model="confirmPassword" />
+        <v-text-field
+         :rules="[required, confirmRule]"
+          hide-details="auto"
+          label="Confirm Password"
+          v-model="confirmPassword"
+        ></v-text-field>
       </v-card-text>
         <template v-slot:actions>
           <v-spacer></v-spacer>
@@ -41,9 +46,15 @@
   const password = ref('');
   const confirmPassword = ref('');
 
-  const rules = {
-        required: (value: any) => !!value || 'Field is required',
-      };
+  function required (v: any) {
+    return !!v || 'Field is required'
+  };
+  function confirmRule () {
+    return password.value === confirmPassword.value
+  };
+  // const rules = {
+  //   required: (value: any) => !!value || 'Field is required',
+  // };
 
   function save() {
     if(!password.value.trim()) {
