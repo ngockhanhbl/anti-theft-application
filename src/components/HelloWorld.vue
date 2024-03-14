@@ -43,6 +43,16 @@ function toggleLocationMode() {
   }, 1)
 }
 
+
+watch(() => store.getters.getHeadsetMode, async (newVal, oldVal) => {
+  headsetMode.value = newVal;
+})
+watch(() => store.getters.getPowerMode, async (newVal, oldVal) => {
+  powerMode.value = newVal;
+})
+watch(() => store.getters.getLocationMode, async (newVal, oldVal) => {
+  locationMode.value = newVal;
+})
 </script>
 
 <template>

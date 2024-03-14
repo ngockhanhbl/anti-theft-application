@@ -21,11 +21,6 @@ const locationMode = computed(() => {
   return store.getters.getLocationMode;
 })
 
-// setTimeout(() => {
-//   console.log("starting setVisibleConfirmPassword");
-//   store.dispatch("setVisibleConfirmPasswordModal", true);
-// }, 5000);
-
 function playAudio() {
   //HTMLVideoElement
   document.getElementById("myAudio")?.play();
@@ -34,12 +29,35 @@ function stopAudio() {
   document.getElementById("myAudio")?.pause();
 }
 
+const updateDevices = () => {
+  navigator.mediaDevices.enumerateDevices()
+    .then(function(devices) {
+      // check to see if we have any device with "head" in its name connected
+      // like "headset" or "headphones"
+      let headphonesConnected = devices
+        .filter(device => /audio\w+/.test(device.kind))
+        .find(device => device.label.toLowerCase().includes('head'));
+      store.dispatch("setHeadsetReady", headphonesConnected ? true : false);
+      console.log("headphonesConnected", headphonesConnected ? true : false);
+    })
+  ;
+};
 
+updateDevices();
+
+// add an ondevicechange event listener so we can tell when
+// an input device is connected and disconnected
+navigator.mediaDevices.ondevicechange = updateDevices;
+
+// detect theft
 watch(() => store.getters.getPowerReady, async (newVal, oldVal) => {
-  console.log("powerReady", newVal)
-  console.log("powerMode", powerMode.value)
   if (!newVal && powerMode.value) {
     store.dispatch("setDetectTheft", DetectTheftEnum.Power);
+  }
+})
+watch(() => store.getters.getHeadsetReady, async (newVal, oldVal) => {
+  if (!newVal && headsetMode.value) {
+    store.dispatch("setDetectTheft", DetectTheftEnum.Headset);
   }
 })
 
@@ -52,11 +70,29 @@ watch(() => store.getters.getDetectTheft, async (newVal, oldVal) => {
     // show pop-up
     store.dispatch("setVisibleConfirmPasswordModal", true);
 
-    // TODO write log to db. thoi gian - phuong thuc (10 lan gan nhat).
+    try {
+      let historiesStr = localStorage.getItem("history");
+      let history = {
+        "date": new Date().toLocaleString(),
+        "method": DetectTheftEnum[(newVal as DetectTheftEnum).valueOf()],
+      }
+      console.log(history);
+      if (!historiesStr) {
+        localStorage.setItem("history", JSON.stringify([history]));
+      } else {
+        let histories = JSON.parse(historiesStr);
+        histories.unshift(history);
+        localStorage.setItem("history", JSON.stringify(histories.slice(0, 20)));
+      }
+    } catch (error) {
+      console.log(error)
+    }
   } else {
     stopAudio();
   }
 })
+// end detect theft
+
 
 </script>
 

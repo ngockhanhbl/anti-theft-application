@@ -17,13 +17,12 @@
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                       <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">Enter your Password</DialogTitle>
                       <div class="mt-2">
-                        <input type="text" placeholder="Password" v-model="password" />
-                        <!-- <input type="text" placeholder="Password" v-model="password" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                        <input type="text" placeholder="Password" v-model="password" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
                             focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
-                            
+                            disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
                             invalid:border-pink-500 invalid:text-pink-600
                             focus:invalid:border-pink-500 focus:invalid:ring-pink-500
-                        "/> -->
+                        "/>
                       </div>
                     </div>
                   </div>
@@ -37,9 +36,9 @@
         </div>
       </Dialog>
     </TransitionRoot>
-  </template>
+</template>
   
-  <script setup lang="ts">
+<script setup lang="ts">
   import { ref, computed, watch } from 'vue';
   import { useStore } from 'vuex';
   import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
@@ -54,14 +53,27 @@
     const pw = localStorage.getItem("pw");
     if(password.value.trim() !== pw) {
       // TODO alert make form no longer entered input
-      alert("The Password is incorrect. Please try again");
       return;
     } else {
-      store.dispatch("setDetectTheft", DetectTheftEnum.None);
       store.dispatch("setVisibleConfirmPasswordModal", false);
+      const detect = store.getters.getDetectTheft
+      store.dispatch("setDetectTheft", DetectTheftEnum.None);
 
-      store.dispatch("togglePowerMode", false);
-      alert("Successfully!!! Please reconnect the charger to continue using the feature");
+      setTimeout(() => {
+        if (detect === DetectTheftEnum.Power) {
+        store.dispatch("togglePowerMode", false);
+        } else if (detect === DetectTheftEnum.Headset) {
+          store.dispatch("toggleHeadsetMode", false);
+        }else {
+          store.dispatch("toggleLocationMode", false);
+        }
+
+        (detect === DetectTheftEnum.Location) ?
+        alert("Successfully!!!"):
+        alert(`Successfully!!! Please reconnect ${detect === DetectTheftEnum.Power  ? 'the charger': 'headset'} to continue using the feature`);
+      },100)
+
+      password.value = '';
     }
   }
 

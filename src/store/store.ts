@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-import {ErrorToggleCodeEnum, DetectTheftEnum} from '../src/utils/constants';
+import {ErrorToggleCodeEnum, DetectTheftEnum} from '../utils/constants';
 const store = createStore({
   state: {
     powerMode: false,
@@ -52,8 +52,13 @@ const store = createStore({
         state.powerMode = payload;
       }
     },
-    toggleHeadsetMode (state) {
+    toggleHeadsetMode (state, payload) {
+      if (payload == null) {
         state.headsetMode = !state.headsetMode;
+      } else {
+        console.log("vo else roi ne", payload)
+        state.headsetMode = payload;
+      }
     },
     toggleLocationMode (state) {
         state.locationMode = !state.locationMode;
@@ -62,11 +67,8 @@ const store = createStore({
     toggleLocationReady (state) {
         state.locationReady = !state.locationReady;
     },
-    toggleHeadsetReady (state) {
-        state.headsetReady = !state.headsetReady;
-    },
-    togglePowerReady (state) {
-        state.powerReady = !state.powerReady;
+    setHeadsetReady (state, payload: boolean) {
+        state.headsetReady = payload;
     },
     setErrorToggleCode(state, payload: ErrorToggleCodeEnum) {
       state.errorToggleCode = payload;
@@ -90,9 +92,9 @@ const store = createStore({
         context.commit('setErrorToggleCode', ErrorToggleCodeEnum.PowerErr);
       }
     },
-    toggleHeadsetMode (context) {
+    toggleHeadsetMode (context, payload) {
         if(this.state.headsetMode || this.state.headsetReady) {
-            context.commit('toggleHeadsetMode')
+            context.commit('toggleHeadsetMode', payload)
         } else {
             context.commit('setErrorToggleCode', ErrorToggleCodeEnum.HeadsetErr);
         }
@@ -118,12 +120,8 @@ const store = createStore({
       context.commit('setVisibleConfirmPasswordModal', payload);
     },
 
-    togglePowerReady (context) {
-      context.commit('togglePowerReady')
-    },
-    toggleHeadsetReady (context) {
-        console.log("toggleHeadsetReady ne");
-        context.commit('toggleHeadsetReady')
+    setHeadsetReady (context, payload: boolean) {
+        context.commit('setHeadsetReady', payload)
     },
     toggleLocationReady (context) {
         context.commit('toggleLocationReady')

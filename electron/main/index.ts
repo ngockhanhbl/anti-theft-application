@@ -1,13 +1,13 @@
-import { app, BrowserWindow, shell, ipcMain, powerMonitor } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, powerMonitor, Menu } from 'electron'
 import { release } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+// import {menu} from './menu';
+
+
 globalThis.__filename = fileURLToPath(import.meta.url)
 globalThis.__dirname = dirname(__filename)
-
-
-
 
 
 // The built directory structure
@@ -87,6 +87,108 @@ async function createWindow() {
   // win.webContents.on('will-navigate', (event, url) => { }) #344
 }
 
+const isMac = process.platform === 'darwin'
+
+const template = [
+    // { role: 'appMenu' }
+    ...(isMac
+      ? [{
+          label: app.name,
+          submenu: [
+            { role: 'about' },
+            { type: 'separator' },
+            { role: 'services' },
+            { type: 'separator' },
+            { role: 'hide' },
+            { role: 'hideOthers' },
+            { role: 'unhide' },
+            { type: 'separator' },
+            { role: 'quit' }
+          ]
+        }]
+      : []),
+    // { role: 'fileMenu' }
+    {
+      label: 'File',
+      submenu: [
+        isMac ? { role: 'close' } : { role: 'quit' }
+      ]
+    },
+    
+    // { role: 'viewMenu' }
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    },
+    // { role: 'windowMenu' }
+    {
+      label: 'Window',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'zoom' },
+        ...(isMac
+          ? [
+              { type: 'separator' },
+              { role: 'front' },
+              { type: 'separator' },
+              { role: 'window' }
+            ]
+          : [
+              { role: 'close' }
+            ])
+      ]
+    },
+    // { role: 'editMenu' }
+    {
+      label: 'Settings',
+      submenu: [
+        {
+          label: 'Change Password',
+          click: async () => {
+            win?.webContents.send('open-change-password-popup');
+          }
+        },
+        {
+          label: 'Change Audio',
+          click: async () => {
+            win?.webContents.send('open-audio-popup');
+          }
+        },
+      ]
+    },
+    {
+      role: 'help',
+      submenu: [
+        // {
+        //   label: 'Visit Site',
+        //   click: async () => {
+        //     const { shell } = require('electron')
+        //     await shell.openExternal('https://ryantechlabs.com/products/anti-theft')
+        //   }
+        // },
+        {
+          label: 'How to play an alarm sound when the Laptop is in sleep mode',
+          click: async () => {
+            win?.webContents.send('open-learn-alarm-popup', isMac ? 'mac' : 'windows');
+          }
+        }
+      ]
+    }
+  ] as Electron.MenuItemConstructorOptions[];
+
+const menu = Menu.buildFromTemplate(template)
+
+Menu.setApplicationMenu(menu);
 
 app.on('ready', () => {
   console.log("READY ROI NE");
