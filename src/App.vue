@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue';
+import HomePage from './components/HomePage.vue';
 import CreatePasswordModal from './components/CreatePasswordModal.vue';
 import ConfirmPasswordModal from './components/ConfirmPasswordModal.vue';
+import ChangePasswordModal from './components/ChangePasswordModal.vue';
+import Snackbar from './components/snackbar/Snackbar.vue';
+import InfoModal from './components/modal/InfoModal.vue';
+import HistoryModal from './components/HistoryModal.vue';
+import AudioSettingsModal from './components/AudioSettingsModal.vue';
 import {DetectTheftEnum} from './utils/constants';
 
 import { ref, watch, computed } from 'vue'
 import { useStore } from 'vuex';
+ 
 
 const store = useStore()
+
+const audioSrc = ref('');
 
 const powerMode = computed(() => {
   return store.getters.getPowerMode;
@@ -28,6 +36,14 @@ function playAudio() {
 function stopAudio() {
   document.getElementById("myAudio")?.pause();
 }
+
+function getCurrentAudio() {
+  let audio = localStorage.getItem("audio");
+  if (audio) {
+    store.dispatch("setCurrentAudio", audio);
+  }
+}
+getCurrentAudio();
 
 const updateDevices = () => {
   navigator.mediaDevices.enumerateDevices()
@@ -65,9 +81,7 @@ watch(() => store.getters.getDetectTheft, async (newVal, oldVal) => {
   console.log("detectTheft", newVal)
   console.log("DetectTheftEnum.None.valueOf", DetectTheftEnum.None.valueOf())
   if (newVal !== DetectTheftEnum.None.valueOf()) {
-    // play audio
     playAudio();
-    // show pop-up
     store.dispatch("setVisibleConfirmPasswordModal", true);
 
     try {
@@ -93,17 +107,27 @@ watch(() => store.getters.getDetectTheft, async (newVal, oldVal) => {
 })
 // end detect theft
 
+watch(() => store.getters.getCurrentAudio, async (newVal, oldVal) => {
+  localStorage.setItem("audio", newVal);
+
+  audioSrc.value = './assets/audio/' + newVal;
+},{ immediate: true });
 
 </script>
 
 <template>
   <div class="main">
-    <HelloWorld msg="Electron + Vite + Vue" />
+    <HomePage />
     <CreatePasswordModal />
     <ConfirmPasswordModal />
-    <audio id="myAudio" controls loop preload="none" hidden>
-      <source src="./assets/audio/audio.mp3" type="audio/mpeg">
-      <source src="./assets/audio/audio.ogg" type="audio/ogg" />
+    <ChangePasswordModal  />
+    <HistoryModal />
+    <AudioSettingsModal />
+    <Snackbar />
+    <InfoModal />
+    {{ audioSrc }}
+    <audio id="myAudio"  controls loop preload="none" hidden>
+      <source :src=audioSrc type="audio/mpeg">
     </audio>
   </div>
 </template>

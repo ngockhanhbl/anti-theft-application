@@ -2,12 +2,14 @@ import { app, BrowserWindow, shell, ipcMain, powerMonitor, Menu } from 'electron
 import { release } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { watch, readdirSync, writeFileSync, writeFile } from 'node:fs'
 
 // import {menu} from './menu';
 
 
 globalThis.__filename = fileURLToPath(import.meta.url)
 globalThis.__dirname = dirname(__filename)
+
 
 
 // The built directory structure
@@ -77,6 +79,7 @@ async function createWindow() {
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
     win?.webContents.send('on-ac', !powerMonitor.isOnBatteryPower())
+    handleSendAudioFiles(getAudioFiles(), true);
   })
 
   // Make all links open with the browser, not with the application
@@ -86,9 +89,31 @@ async function createWindow() {
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
 }
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+var audioFiles = []
+
+function getAudioFiles(): string[] {
+  return readdirSync(join(__dirname, '../../src/assets/audio'));
+}
+
+watch(join(__dirname, '../../src/assets/audio'), (eventType, filename) => {
+  audioFiles = getAudioFiles();
+  handleSendAudioFiles(audioFiles)
+})
+
+ function handleSendAudioFiles(list: string[], sendDefault = false) {
+  if (sendDefault) {
+    // win?.webContents.send('default-audio', list.find((x) => x === 'siren.mp3') ?? list[0])
+  }
+  win?.webContents.send('audio-list', list);
+}
+
+
 
 const isMac = process.platform === 'darwin'
-
 const template = [
     // { role: 'appMenu' }
     ...(isMac
@@ -177,7 +202,14 @@ const template = [
         //   }
         // },
         {
-          label: 'How to play an alarm sound when the Laptop is in sleep mode',
+          label: 'History',
+          click: async () => {
+            win?.webContents.send('open-history-popup', isMac ? 'mac' : 'windows');
+          }
+        },
+        {
+          // label: 'How to play an alarm sound when the Laptop is in sleep mode',
+          label: 'Alarm sound in sleep mode',
           click: async () => {
             win?.webContents.send('open-learn-alarm-popup', isMac ? 'mac' : 'windows');
           }
@@ -191,6 +223,8 @@ const menu = Menu.buildFromTemplate(template)
 Menu.setApplicationMenu(menu);
 
 app.on('ready', () => {
+  createWindow()
+
   console.log("READY ROI NE");
   console.log(powerMonitor);
   powerMonitor.on('suspend', () => {
@@ -220,8 +254,10 @@ app.on('ready', () => {
     
   powerMonitor.on('unlock-screen', () => { 
       console.log('The system is unlocked'); 
-  }); 
-  createWindow()
+  });
+
+  win?.webContents.send('open-change-password-popup');
+
 })
 
 app.on('window-all-closed', () => {
@@ -246,11 +282,23 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.handle('power', (_, arg) => {
-  console.log('main recived arg');
+ipcMain.handle('add-audio-file', (_, arg) => {
+  console.log('main recived add-audio-file');
   console.log(arg);
-  console.log(_);
-  console.log('main recived arg end');
+  let buffer = arg.buffer;
+  let fileName = arg.fileName
+  if (!(buffer instanceof ArrayBuffer)) return false;
+
+  return new Promise(function (resolve, reject) {
+    return writeFile(join(__dirname, `../../src/assets/audio/${fileName}`), Buffer.from(buffer), err => {
+      if (err) {
+        resolve(false);
+      } else {
+        resolve(true);
+      }
+    });
+  })
+  
 })
 
 // New window example arg: new windows url

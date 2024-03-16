@@ -5,52 +5,9 @@ import { ipcRenderer, contextBridge, powerMonitor } from 'electron';
 contextBridge.exposeInMainWorld('ipcRenderer', withPrototype(ipcRenderer))
 
 
-function test() {
-  // console.log("powerMonitor NENENENENNE")
-  // console.log(powerMonitor)
-// powerMonitor.on('suspend', () => { 
-//   console.log('The system is going to sleep'); 
-// }); 
 
-// powerMonitor.on('resume', () => { 
-//   console.log('The system is resuming'); 
-// }); 
-
-// powerMonitor.on('on-ac', () => { 
-//   console.log('The system is on AC Power (charging)'); 
-//   contextBridge.exposeInMainWorld('power', {
-//     charging: () => true
-//   })
-// }); 
-
-// powerMonitor.on('on-battery', () => { 
-//   console.log('The system is on Battery Power'); 
-//   contextBridge.exposeInMainWorld('power', {
-//     charging: () => false
-//   })
-// }); 
-
-// powerMonitor.on('shutdown', () => { 
-//   console.log('The system is Shutting Down'); 
-// }); 
-
-// powerMonitor.on('lock-screen', () => { 
-//   console.log('The system is about to be locked'); 
-// }); 
-
-// powerMonitor.on('unlock-screen', () => { 
-//   console.log('The system is unlocked'); 
-// }); 
-
-// const state = powerMonitor.getSystemIdleState(4); 
-// console.log('Current System State - ', state); 
-
-// const idle = powerMonitor.getSystemIdleTime(); 
-// console.log('Current System Idle Time - ', idle);
-}
-
- 
-
+  console.log("__dirname");
+  console.log(__dirname);
 
 
 // `exposeInMainWorld` can't detect attributes and methods of `prototype`, manually patching it.
@@ -158,7 +115,7 @@ function useLoading() {
 // ----------------------------------------------------------------------
 
 const { appendLoading, removeLoading } = useLoading()
-domReady().then(appendLoading).then(test)
+domReady().then(appendLoading)
 
 window.onmessage = (ev) => {
   ev.data.payload === 'removeLoading' && removeLoading()

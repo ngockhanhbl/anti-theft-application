@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 import {ErrorToggleCodeEnum, DetectTheftEnum} from '../utils/constants';
+import {IInfoModal, ISnackbar} from '../utils/interface_type';
 const store = createStore({
   state: {
     powerMode: false,
@@ -13,6 +14,13 @@ const store = createStore({
     errorToggleCode: ErrorToggleCodeEnum.None,
     detectTheft: DetectTheftEnum.None,
     visibleConfirmPasswordModal: false,
+    snackbar: null as ISnackbar | null,
+    infoModal: null as IInfoModal | null,
+    changePasswordModal: false,
+    historyModal: false,
+    audioModal: false,
+    audioList: ['', ''] as Array<string>,
+    currentAudio: '',
   },
   getters: {
     getPowerMode (state): boolean {
@@ -43,6 +51,27 @@ const store = createStore({
     getVisibleConfirmPasswordModal (state): boolean {
       return state.visibleConfirmPasswordModal;
     },
+    getSnackbar (state) {
+      return state.snackbar;
+    },
+    getInfoModal (state) {
+      return state.infoModal;
+    },
+    getChangePasswordModal(state) {
+      return state.changePasswordModal;
+    },
+    getHistoryModal(state) {
+      return state.historyModal;
+    },
+    getAudioModal(state) {
+      return state.audioModal;
+    },
+    getAudioList(state) {
+      return state.audioList;
+    },
+    getCurrentAudio(state) {
+      return state.currentAudio;
+    },
   },
   mutations: {
     togglePowerMode (state, payload) {
@@ -56,7 +85,6 @@ const store = createStore({
       if (payload == null) {
         state.headsetMode = !state.headsetMode;
       } else {
-        console.log("vo else roi ne", payload)
         state.headsetMode = payload;
       }
     },
@@ -82,7 +110,31 @@ const store = createStore({
     setVisibleConfirmPasswordModal(state, payload: boolean) {
       state.visibleConfirmPasswordModal = payload;
     },
-
+    setSnackbar(state, payload) {
+      state.snackbar = payload;
+    },
+    setInfoModal (state, payload) {
+      state.infoModal = payload;
+    },
+    setChangePasswordModal (state, payload) {
+      state.changePasswordModal = payload;
+    },
+    setHistoryModal (state, payload) {
+      state.historyModal = payload;
+    },
+    setAudioModal (state, payload) {
+      state.audioModal = payload;
+    },
+    setAudioList (state, payload: Array<string>) {
+      if (!payload.find((x) => x === state.currentAudio)) {
+        console.log("set Defaut");
+        state.currentAudio = 'siren.mp3';
+      }
+      state.audioList = payload;
+    },
+    setCurrentAudio (state, payload) {
+      state.currentAudio = payload;
+    },
   },
   actions: {
     togglePowerMode (context, payload) {
@@ -125,7 +177,31 @@ const store = createStore({
     },
     toggleLocationReady (context) {
         context.commit('toggleLocationReady')
-    }
+    },
+    setSnackbar (context, payload) {
+      console.log("setSnackbar coomit");
+        context.commit('setSnackbar', payload)
+    },
+    setInfoModal (context, payload) {
+      context.commit('setInfoModal', payload)
+    },
+    setChangePasswordModal (context, payload) {
+      console.log("setChangePasswordModal", payload);
+      context.commit('setChangePasswordModal', payload)
+    },
+    setHistoryModal (context, payload) {
+      context.commit('setHistoryModal', payload)
+    },
+    setAudioModal(context, payload) {
+      context.commit('setAudioModal', payload)
+    },
+    setAudioList(context, payload) {
+      context.commit('setAudioList', payload)
+    },
+    setCurrentAudio(context, payload) {
+      context.commit('setCurrentAudio', payload)
+    },
+    
   }
 })
 

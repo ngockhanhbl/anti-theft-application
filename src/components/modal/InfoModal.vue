@@ -1,59 +1,49 @@
 <template>
-    <TransitionRoot as="template" :show="open">
-      <Dialog as="div" class="relative z-10" @close="closeFunc">
-        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-        </TransitionChild>
+  <div class="text-center">
+    <v-dialog
+      v-model="open"
+      width="auto"
+    >
+      <v-card
+        max-width="400"
+        :prepend-icon="icon"
+        :text="msg"
+        :title=title
+      >
+        <template v-slot:actions>
+          <v-btn
+            class="ms-auto"
+            text="Ok"
+            @click="closeFunc"
+          ></v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
   
-        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div class="flex min-h-100 items-end justify-center p-4 text-center sm:align-center sm:p-0">
-            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-100 sm:max-w-lg">
-                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                  <div class="sm:flex sm:items-start">
-                    <div class="mx-auto d-flex h-12 w-12 flex-shrink-0 align-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                      <div class="h-6 w-6 text-red-600" aria-hidden="true">
-                        <slot>
-                          <InformationCircleIcon />
-                        </slot>
-                      </div>
-                    </div>
-                    <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                      <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">{{props.title ?? ''}}</DialogTitle>
-                      <div class="mt-2">
-                        <p class="text-sm text-gray-500">{{props.msg ?? ''}}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                  <!-- <button type="button" class="d-inline-flex w-100 justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto" @click="open = false">Deactivate</button> -->
-                  <button type="button" class="mt-3 d-inline-flex w-100 justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" @click="closeFunc" >OK</button>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
-  </template>
-  
-  <script setup lang="ts">
-  import { ref, computed, watch } from 'vue';
-  import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-  import { InformationCircleIcon } from '@heroicons/vue/24/outline';
+<script setup lang="ts">
+import { ref, watch } from 'vue';
+import { useStore } from 'vuex';
+import { IInfoModal } from '../../utils/interface_type';
 
-  const props = defineProps({
-    title: { type: String, required: true },
-    msg: { type: String, required: true },
-    open: { type: Boolean, default: false },
-  })
-  const emit = defineEmits(['onClose'])
+const store = useStore()
 
-  const open = ref(props.open);
+watch(() => store.getters.getInfoModal, async (newVal: IInfoModal | null, oldVal) => {
+  console.log("info modal watch", newVal);
+  msg.value = newVal == null ? '' : newVal?.msg ?? '';
+  title.value = newVal == null ? '' : newVal?.title ?? '';
+  open.value = newVal == null ? false : newVal?.open ?? false;
+  icon.value = newVal == null ? 'mdi-information' : newVal?.icon ?? 'mdi-information';
+})
 
-  function closeFunc() {
-    emit('onClose');
-  }
+const open = ref(false);
+const title = ref('');
+const msg = ref('');
+const icon = ref('mdi-information');
 
-  </script>
+function closeFunc() {
+  store.dispatch("setInfoModal", null);
+}
+
+</script>

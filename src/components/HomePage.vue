@@ -1,26 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import ErrorToggleModal from './ErrorToggleModal.vue';
-// import {ErrorToggleCodeEnum} from '../utils/constants';
-
-
-// defineProps<{ msg: string }>()
 
 const store = useStore()
 const powerMode = ref(false)
 const headsetMode = ref(false)
 const locationMode = ref(false)
-
-// test scrope
-const powerready = computed(() => {
-  return store.getters.getHeadsetReady;
-})
-// end test scrope
-
-const errorToggleCode = computed(() => {
-  return store.getters.getErrorToggleCode;
-});
 
 function togglePowerMode() {
   store.dispatch("togglePowerMode");
