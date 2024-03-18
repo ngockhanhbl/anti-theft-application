@@ -255,6 +255,14 @@ const template = [
             win?.webContents.send('open-audio-popup');
           }
         },
+        { type: 'separator' },
+        {
+          // label: 'How to play an alarm sound when the Laptop is in sleep mode',
+          label: 'Alarm sound in sleep mode',
+          click: async () => {
+            win?.webContents.send('open-learn-alarm-popup', isMac ? 'mac' : 'windows');
+          }
+        }
       ]
     },
     {
@@ -268,18 +276,18 @@ const template = [
         //   }
         // },
         {
+          label: 'About Us',
+          click: async () => {
+            win?.webContents.send('open-about-us');
+          }
+        },
+        {
           label: 'History',
           click: async () => {
             win?.webContents.send('open-history-popup', isMac ? 'mac' : 'windows');
           }
         },
-        {
-          // label: 'How to play an alarm sound when the Laptop is in sleep mode',
-          label: 'Alarm sound in sleep mode',
-          click: async () => {
-            win?.webContents.send('open-learn-alarm-popup', isMac ? 'mac' : 'windows');
-          }
-        }
+        
       ]
     }
   ] as Electron.MenuItemConstructorOptions[];

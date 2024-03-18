@@ -10,10 +10,11 @@ import AudioSettingsModal from './components/AudioSettingsModal.vue';
 import LearnAlarmModal from './components/LearnAlarmModal.vue';
 import {DetectTheftEnum} from './utils/constants';
 
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onBeforeMount } from 'vue'
 import { useStore } from 'vuex';
 import { ISnackbar } from './utils/interface_type';
 import { setLidDoNothing } from './demos/ipc';
+import { getAudioAssetUrl } from './utils/helper_function';
  
 
 const store = useStore()
@@ -32,6 +33,28 @@ const headsetMode = computed(() => {
 // const locationMode = computed(() => {
 //   return store.getters.getLocationMode;
 // })
+
+const showWarning = ref(true);
+
+function checkisShowWarning() {
+  let total = localStorage.getItem("totalAppOpens");
+  if (!total) {
+    localStorage.setItem("totalAppOpens", '1');
+    return true;
+  } else {
+    try {
+      let count = Number(total);
+      return (count > 20) ? false : true; 
+    } catch(e) {
+      return true;
+    }
+  }
+
+}
+onBeforeMount(() => {
+  showWarning.value = checkisShowWarning();
+})
+
 
 
 function playAudio() {
@@ -56,6 +79,7 @@ function getCurrentAudio() {
   if (audioStr) {
     store.dispatch("setCurrentAudio", audioStr);
   }
+  // maximum volume of system volume
   setAudioVolume(1);
 }
 
@@ -92,6 +116,10 @@ watch(() => store.getters.getHeadsetReady, async (newVal, oldVal) => {
   }
 })
 
+function openSettingAlarm() {
+  store.dispatch('setLearnAlarmModal', true);
+}
+
 watch(() => store.getters.getDetectTheft, async (newVal, oldVal) => {
   // console.log("detectTheft", newVal)
   if (newVal !== DetectTheftEnum.None.valueOf()) {
@@ -120,10 +148,10 @@ watch(() => store.getters.getDetectTheft, async (newVal, oldVal) => {
 })
 // end detect theft
 
-watch(() => store.getters.getCurrentAudio, async (newVal, oldVal) => {
+watch( () => store.getters.getCurrentAudio, async (newVal, oldVal) => {
   localStorage.setItem("audio", newVal);
 
-  audioSrc.value = './assets/audio/' + newVal;
+  audioSrc.value = getAudioAssetUrl(newVal).toString();
 },{ immediate: true });
 
 watch(() => store.getters.getAudioVolume, async (newVal, oldVal) => {
@@ -145,27 +173,46 @@ watch(() => store.getters.getAudioVolume, async (newVal, oldVal) => {
 </script>
 
 <template>
-  <div class="main">
-    <HomePage />
-    <CreatePasswordModal />
-    <ConfirmPasswordModal />
-    <ChangePasswordModal  />
-    <HistoryModal />
-    <AudioSettingsModal />
-    <LearnAlarmModal />
-    <Snackbar />
-    <InfoModal />
-    <audio id="myAudio" ref="audioRef" controls loop preload="none" hidden>
-      <!-- <source :src=audioSrc type="audio/mpeg">
-      <source :src=audioSrc type="audio/mpeg"> -->
-      <source src="./assets/audio/honk.mp3" type="audio/mpeg">
-    </audio>
+  <div class="main h-100">
+      <div v-show="showWarning" class="warning rounded px-1 py-1 border-width border-sky-30">By default when someone lids your computer,the application will not make a sound to warn you, so please set mode do nothing <span class="text-decoration-underline cursor-pointer	" @click="openSettingAlarm" >here</span> </div>
+      <div class="main-content w-100">
+        <HomePage />
+        <CreatePasswordModal />
+        <ConfirmPasswordModal />
+        <ChangePasswordModal  />
+        <HistoryModal />
+        <AudioSettingsModal />
+        <LearnAlarmModal />
+        <Snackbar />
+        <InfoModal />
+        {{ audioSrc }}
+        <audio id="myAudio" ref="audioRef" controls loop preload="none" hidden>
+          <source :src="audioSrc" type="audio/mpeg">
+          <!-- <source src="./assets/audio/my_custom_audio.mp3" type="audio/mpeg"> -->
+        </audio>
+      </div>
+    
   </div>
 </template>
 
 <style>
 .main {
  width: 900px;
+ position: relative;
+}
+
+.main-content {
+  position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+.warning {
+  position: absolute;
+  background: blueviolet;
+  color: white;
+  text-align: center;
+  line-height: 1.6rem;
 }
 
 .logo {

@@ -53,12 +53,12 @@
           </v-list-item>
 
 
-          <v-list-subheader>Audio Volume {{audioVolume}}</v-list-subheader>
+          <v-list-subheader>Audio Volume</v-list-subheader>
           <v-list-item>
             <v-slider
               v-model="audioVolume"
               color="blue"
-              label="color"
+              label=""
               :max="100"
               :min="0"
               :step="1"
