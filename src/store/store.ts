@@ -21,6 +21,10 @@ const store = createStore({
     audioModal: false,
     audioList: ['', ''] as Array<string>,
     currentAudio: '',
+    audioVolume: -1,
+    learnAlarmModal: false,
+
+    
   },
   getters: {
     getPowerMode (state): boolean {
@@ -71,6 +75,12 @@ const store = createStore({
     },
     getCurrentAudio(state) {
       return state.currentAudio;
+    },
+    getAudioVolume(state) {
+      return state.audioVolume;
+    },
+    getLearnAlarmModal(state) {
+      return state.learnAlarmModal;
     },
   },
   mutations: {
@@ -127,13 +137,18 @@ const store = createStore({
     },
     setAudioList (state, payload: Array<string>) {
       if (!payload.find((x) => x === state.currentAudio)) {
-        console.log("set Defaut");
         state.currentAudio = 'siren.mp3';
       }
       state.audioList = payload;
     },
     setCurrentAudio (state, payload) {
       state.currentAudio = payload;
+    },
+    setAudioVolume (state, payload) {
+      state.audioVolume = payload;
+    },
+    setLearnAlarmModal(state, payload) {
+      state.learnAlarmModal = payload;
     },
   },
   actions: {
@@ -179,14 +194,12 @@ const store = createStore({
         context.commit('toggleLocationReady')
     },
     setSnackbar (context, payload) {
-      console.log("setSnackbar coomit");
-        context.commit('setSnackbar', payload)
+      context.commit('setSnackbar', payload)
     },
     setInfoModal (context, payload) {
       context.commit('setInfoModal', payload)
     },
     setChangePasswordModal (context, payload) {
-      console.log("setChangePasswordModal", payload);
       context.commit('setChangePasswordModal', payload)
     },
     setHistoryModal (context, payload) {
@@ -201,7 +214,12 @@ const store = createStore({
     setCurrentAudio(context, payload) {
       context.commit('setCurrentAudio', payload)
     },
-    
+    setAudioVolume(context, payload) {
+      context.commit('setAudioVolume', payload)
+    },
+    setLearnAlarmModal(context, payload) {
+      context.commit('setLearnAlarmModal', payload)
+    },
   }
 })
 

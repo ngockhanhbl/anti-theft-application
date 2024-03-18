@@ -30,7 +30,6 @@ import { IInfoModal } from '../../utils/interface_type';
 const store = useStore()
 
 watch(() => store.getters.getInfoModal, async (newVal: IInfoModal | null, oldVal) => {
-  console.log("info modal watch", newVal);
   msg.value = newVal == null ? '' : newVal?.msg ?? '';
   title.value = newVal == null ? '' : newVal?.title ?? '';
   open.value = newVal == null ? false : newVal?.open ?? false;

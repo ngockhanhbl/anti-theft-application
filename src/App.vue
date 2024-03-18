@@ -7,15 +7,19 @@ import Snackbar from './components/snackbar/Snackbar.vue';
 import InfoModal from './components/modal/InfoModal.vue';
 import HistoryModal from './components/HistoryModal.vue';
 import AudioSettingsModal from './components/AudioSettingsModal.vue';
+import LearnAlarmModal from './components/LearnAlarmModal.vue';
 import {DetectTheftEnum} from './utils/constants';
 
 import { ref, watch, computed } from 'vue'
 import { useStore } from 'vuex';
+import { ISnackbar } from './utils/interface_type';
+import { setLidDoNothing } from './demos/ipc';
  
 
 const store = useStore()
 
 const audioSrc = ref('');
+const audioRef = ref<HTMLAudioElement>();
 
 const powerMode = computed(() => {
   return store.getters.getPowerMode;
@@ -25,9 +29,10 @@ const headsetMode = computed(() => {
   return store.getters.getHeadsetMode;
 })
 
-const locationMode = computed(() => {
-  return store.getters.getLocationMode;
-})
+// const locationMode = computed(() => {
+//   return store.getters.getLocationMode;
+// })
+
 
 function playAudio() {
   //HTMLVideoElement
@@ -37,12 +42,23 @@ function stopAudio() {
   document.getElementById("myAudio")?.pause();
 }
 
-function getCurrentAudio() {
-  let audio = localStorage.getItem("audio");
-  if (audio) {
-    store.dispatch("setCurrentAudio", audio);
-  }
+function setAudioVolume(val: number) {
+  setTimeout(() => {
+    console.log(document.getElementById("myAudio"));
+    if (document.getElementById("myAudio")) {
+      document.getElementById("myAudio")!.volume = val;
+    }
+  }, 1000)
 }
+
+function getCurrentAudio() {
+  let audioStr = localStorage.getItem("audio");
+  if (audioStr) {
+    store.dispatch("setCurrentAudio", audioStr);
+  }
+  setAudioVolume(1);
+}
+
 getCurrentAudio();
 
 const updateDevices = () => {
@@ -54,7 +70,6 @@ const updateDevices = () => {
         .filter(device => /audio\w+/.test(device.kind))
         .find(device => device.label.toLowerCase().includes('head'));
       store.dispatch("setHeadsetReady", headphonesConnected ? true : false);
-      console.log("headphonesConnected", headphonesConnected ? true : false);
     })
   ;
 };
@@ -78,8 +93,7 @@ watch(() => store.getters.getHeadsetReady, async (newVal, oldVal) => {
 })
 
 watch(() => store.getters.getDetectTheft, async (newVal, oldVal) => {
-  console.log("detectTheft", newVal)
-  console.log("DetectTheftEnum.None.valueOf", DetectTheftEnum.None.valueOf())
+  // console.log("detectTheft", newVal)
   if (newVal !== DetectTheftEnum.None.valueOf()) {
     playAudio();
     store.dispatch("setVisibleConfirmPasswordModal", true);
@@ -90,7 +104,6 @@ watch(() => store.getters.getDetectTheft, async (newVal, oldVal) => {
         "date": new Date().toLocaleString(),
         "method": DetectTheftEnum[(newVal as DetectTheftEnum).valueOf()],
       }
-      console.log(history);
       if (!historiesStr) {
         localStorage.setItem("history", JSON.stringify([history]));
       } else {
@@ -99,7 +112,7 @@ watch(() => store.getters.getDetectTheft, async (newVal, oldVal) => {
         localStorage.setItem("history", JSON.stringify(histories.slice(0, 20)));
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   } else {
     stopAudio();
@@ -113,6 +126,22 @@ watch(() => store.getters.getCurrentAudio, async (newVal, oldVal) => {
   audioSrc.value = './assets/audio/' + newVal;
 },{ immediate: true });
 
+watch(() => store.getters.getAudioVolume, async (newVal, oldVal) => {
+  if (newVal <= 30) {
+    const snackbar: ISnackbar = {
+      msg: newVal === 0 ? 'warning! you haven\'t turned up the volume yet' : 'Your volume is a bit low. Do you want to open it louder?',
+      timeout: 6000,
+      actionName: 'Yes, I do',
+      actionCallback: () => {
+        console.log("callback call")
+        store.dispatch("setAudioModal", true)
+      },
+      open: true,
+    }
+    store.dispatch("setSnackbar", snackbar)
+  }
+});
+
 </script>
 
 <template>
@@ -123,11 +152,13 @@ watch(() => store.getters.getCurrentAudio, async (newVal, oldVal) => {
     <ChangePasswordModal  />
     <HistoryModal />
     <AudioSettingsModal />
+    <LearnAlarmModal />
     <Snackbar />
     <InfoModal />
-    {{ audioSrc }}
-    <audio id="myAudio"  controls loop preload="none" hidden>
-      <source :src=audioSrc type="audio/mpeg">
+    <audio id="myAudio" ref="audioRef" controls loop preload="none" hidden>
+      <!-- <source :src=audioSrc type="audio/mpeg">
+      <source :src=audioSrc type="audio/mpeg"> -->
+      <source src="./assets/audio/honk.mp3" type="audio/mpeg">
     </audio>
   </div>
 </template>

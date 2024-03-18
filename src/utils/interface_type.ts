@@ -4,6 +4,8 @@ export interface ISnackbar {
     timeout?: number,
     msg: string,
     open: boolean,
+    actionName?: string,
+    actionCallback?: Function,
 }
 
 export interface IToggleError {

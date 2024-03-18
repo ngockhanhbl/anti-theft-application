@@ -57,7 +57,7 @@ watch(() => store.getters.getLocationMode, async (newVal, oldVal) => {
               @click="togglePowerMode"
             ></v-switch>
           </div>
-        <img src="../assets/energetic.svg" class="main-icon  py-2" alt="Electron logo" />
+        <img src="../assets/energetic.svg" class="main-icon  py-2" />
         <div class="py-2">
           <p class="text-white des">An alarm sounds when the power cord is unplugged.</p>
         </div>
@@ -78,7 +78,7 @@ watch(() => store.getters.getLocationMode, async (newVal, oldVal) => {
             ></v-switch>
           </div>
         </div>
-        <img src="../assets/headset.svg" class="main-icon py-2" alt="Electron logo" />
+        <img src="../assets/headset.svg" class="main-icon py-2"/>
         <div class="py-2">
           <p class="text-white des ">An alarm sounds when the headset is removed.</p>
         </div>
@@ -100,7 +100,7 @@ watch(() => store.getters.getLocationMode, async (newVal, oldVal) => {
             ></v-switch>
           </div>
         </div>
-        <img src="../assets/direction.svg" class="main-icon  py-2 " alt="Electron logo" />
+        <img src="../assets/direction.svg" class="main-icon  py-2 " />
         <div class=" py-2 ">
           <p class="text-white des">An alarm sounds  when the laptop is moved.</p>
         </div>

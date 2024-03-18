@@ -64,8 +64,6 @@
     <script setup lang="ts">
     import { ref, computed, watch } from 'vue';
     import { useStore } from 'vuex';
-    import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-    import { KeyIcon } from '@heroicons/vue/24/outline';
     import { IInfoModal, ISnackbar } from '../utils/interface_type';
     import AppModal from './modal/AppModal.vue';
     const store = useStore();
@@ -154,7 +152,6 @@
       store.dispatch("setChangePasswordModal", false);
     }
     function outsideClicked() {
-      console.log("outsideClicked");
       if (!resetOpen.value) {
         closeModal();
       }

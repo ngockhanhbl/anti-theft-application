@@ -51,6 +51,22 @@
 
             <v-list-item-title v-text="item"></v-list-item-title>
           </v-list-item>
+
+
+          <v-list-subheader>Audio Volume {{audioVolume}}</v-list-subheader>
+          <v-list-item>
+            <v-slider
+              v-model="audioVolume"
+              color="blue"
+              label="color"
+              :max="100"
+              :min="0"
+              :step="1"
+              @mouseup="mouseup"
+            ></v-slider>
+          </v-list-item>
+
+          
         </v-list>
       </v-card>
     </v-card-text>
@@ -62,11 +78,9 @@
      <script setup lang="ts">
     import { ref, computed, watch } from 'vue';
     import { useStore } from 'vuex';
-    import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-    import { KeyIcon } from '@heroicons/vue/24/outline';
-    import { IInfoModal, ISnackbar } from '../utils/interface_type';
+    import { ISnackbar } from '../utils/interface_type';
     import AppModal from './modal/AppModal.vue';
-    import { addFile } from '../demos/ipc';
+    import { addFile, setAudioVolume } from '../demos/ipc';
     const store = useStore();
 
     var currentAudio = ref('');
@@ -75,17 +89,34 @@
     var file = ref(null);
     var fileName = ref('');
 
-    const disabled = computed(() => {
-      return loading.value || !myAudioFile.value
-    })
-  
+    var audioVolume = ref(0);
+
     const open = ref(false);
     const loading = ref(false);
     const audioList = ref([]);
+    const disabled = computed(() => {
+      return loading.value || !myAudioFile.value
+    })
+
+    async function mouseup() {
+      let result = await setAudioVolume(audioVolume.value);
+      if ( typeof result === 'number'  ) {
+        store.dispatch("setAudioVolume", result)
+      }
+    }
+   
+    function initAudioVolume() {
+      audioVolume.value = store.getters.getAudioVolume ?? 0;
+      setTimeout(() => {
+        audioVolume.value = store.getters.getAudioVolume ?? 0;
+      }, 200)
+    }
+
+    initAudioVolume();
+
     async function addAudio() {
       if (myAudioFile.value) {
         try {
-          console.log("uploading..");
           loading.value = true;
 
           let result = await addFile(myAudioFile.value, fileName.value);
@@ -111,15 +142,11 @@
           fileName.value = '';
           loading.value = false;
         }
-      } else {
-        console.log('no file')
-      }
+      } 
     }
     
 
     function handleFileChange(e: any) {
-      console.log("e");
-      console.log(e);
       // Check if file is selected
       if (e.target.files && e.target.files[0]) {
              // Check if file is valid
@@ -140,7 +167,6 @@
     }
   
     function closeModal() {
-      console.log(myAudioFile)
       store.dispatch("setAudioModal", false);
     }
     
@@ -148,11 +174,10 @@
     open.value = newVal;
   })
   watch(() => store.getters.getCurrentAudio, async (newVal, oldVal) => {
-    console.log("audio ", newVal)
     currentAudio.value = newVal;
   },{ immediate: true });
   watch(() => store.getters.getAudioList, async (newVal, oldVal) => {
-    console.log("audioList ", newVal)
     audioList.value = newVal;
   },{ immediate: true })
+
   </script>

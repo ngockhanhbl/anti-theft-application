@@ -39,7 +39,7 @@
   </template>
     
   <script setup lang="ts">
-  import { ref, watch, onDeactivated } from 'vue';
+  import { ref,} from 'vue';
   const emit = defineEmits(['okCallback', 'cancelCallback', 'outsideClicked'])
     const props = defineProps({
         open: { type: Boolean, default: false },
@@ -66,13 +66,6 @@
   function okClicked() {
     emit("okCallback");
   }
-
-
-  console.log("APP MODAL")
-  onDeactivated(() => {
-    console.log("emit open.value", open.value);
-
-  })
 
   function cancelClicked() {
     emit("cancelCallback");

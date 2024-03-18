@@ -4,7 +4,13 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { watch, readdirSync, writeFileSync, writeFile } from 'node:fs'
 
+import { exec } from 'node:child_process'
+
+
 // import {menu} from './menu';
+import * as loud from 'loudness';
+
+import * as koffi from 'koffi';
 
 
 globalThis.__filename = fileURLToPath(import.meta.url)
@@ -55,7 +61,7 @@ async function createWindow() {
     title: 'Main window',
     width: 1000,
     height: 750,
-    icon: join(process.env.VITE_PUBLIC, 'favicon.ico'),
+    icon: join(process.env.VITE_PUBLIC, ''),
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -80,6 +86,7 @@ async function createWindow() {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
     win?.webContents.send('on-ac', !powerMonitor.isOnBatteryPower())
     handleSendAudioFiles(getAudioFiles(), true);
+    sendAudioVolume()
   })
 
   // Make all links open with the browser, not with the application
@@ -89,8 +96,67 @@ async function createWindow() {
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
 }
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+
+
+function setLidOnACDoNothing() {
+  return new Promise(function (resolve, reject) {
+    exec("powercfg /setacvalueindex scheme_current sub_buttons lidaction 0", (error, stdout, stderr) => {
+      if (error || stderr) {
+        resolve(false)
+      } else {
+        resolve(true);
+      }
+    });
+  })
+}
+function setLidOnDCDoNothing() {
+  return new Promise(function (resolve, reject) {
+    exec("powercfg /setdcvalueindex scheme_current sub_buttons lidaction 0", (error, stdout, stderr) => {
+      if (error || stderr) {
+        resolve(false)
+      } else {
+        resolve(true);
+      }
+    });
+  })
+}
+
+async function setlidDoNothing() {
+  if (!isMac) {
+    let ac = await setLidOnACDoNothing();
+    let dc = await setLidOnDCDoNothing();
+    return ac && dc;
+  } else {
+    return false;
+  }
+}
+
+
+
+function getLoudnessInstance() {
+  if (loud.default) {
+    return loud.default;
+  } else {
+    return loud;
+  }
+}
+
+async function sendAudioVolume() {
+  let val = await getAudioVolume();
+  win?.webContents.send('audio-volume', val)
+}
+
+async function getAudioVolume() {
+  // console.log("koffi");
+  // const lib = koffi.load('powrprof.dll');
+
+
+  let val = await getLoudnessInstance().getVolume();
+  return val;
+}
+async function setAudioVolume(value) {
+  await getLoudnessInstance().setVolume(value);
+  getAudioVolume().then((val) => console.log("after set", val));
 }
 
 var audioFiles = []
@@ -146,7 +212,7 @@ const template = [
       submenu: [
         { role: 'reload' },
         { role: 'forceReload' },
-        { role: 'toggleDevTools' },
+        // { role: 'toggleDevTools' },
         { type: 'separator' },
         { role: 'resetZoom' },
         { role: 'zoomIn' },
@@ -225,35 +291,33 @@ Menu.setApplicationMenu(menu);
 app.on('ready', () => {
   createWindow()
 
-  console.log("READY ROI NE");
-  console.log(powerMonitor);
   powerMonitor.on('suspend', () => {
-    console.log('The system is going to sleep')
+    // console.log('The system is going to sleep')
   })
   powerMonitor.on('resume', () => { 
-    console.log('The system is resuming'); 
+    // console.log('The system is resuming'); 
   }); 
 
   powerMonitor.on('on-ac', () => { 
-      console.log('The system is on AC Power (charging)'); 
+      // console.log('The system is on AC Power (charging)'); 
       win?.webContents.send('on-ac', true)
   }); 
-    
+  
   powerMonitor.on('on-battery', () => { 
-      console.log('The system is on Battery Power');
+      // console.log('The system is on Battery Power');
       win?.webContents.send('on-ac', false)
   }); 
     
   powerMonitor.on('shutdown', () => { 
-      console.log('The system is Shutting Down'); 
+      // console.log('The system is Shutting Down'); 
   }); 
     
   powerMonitor.on('lock-screen', () => { 
-      console.log('The system is about to be locked'); 
+      // console.log('The system is about to be locked'); 
   }); 
     
   powerMonitor.on('unlock-screen', () => { 
-      console.log('The system is unlocked'); 
+      // console.log('The system is unlocked'); 
   });
 
   win?.webContents.send('open-change-password-popup');
@@ -283,8 +347,6 @@ app.on('activate', () => {
 })
 
 ipcMain.handle('add-audio-file', (_, arg) => {
-  console.log('main recived add-audio-file');
-  console.log(arg);
   let buffer = arg.buffer;
   let fileName = arg.fileName
   if (!(buffer instanceof ArrayBuffer)) return false;
@@ -298,8 +360,22 @@ ipcMain.handle('add-audio-file', (_, arg) => {
       }
     });
   })
-  
 })
+
+ipcMain.handle('set-audio-volume', (_, arg) => {
+  return new Promise(function (resolve, reject) {
+    try {
+      resolve(setAudioVolume(arg));
+    } catch (e) {
+      resolve(false);
+    }
+  })
+})
+
+ipcMain.handle('set-lid-do-nothing', (_, arg) => {
+  return setlidDoNothing();
+})
+
 
 // New window example arg: new windows url
 ipcMain.handle('open-win', (_, arg) => {

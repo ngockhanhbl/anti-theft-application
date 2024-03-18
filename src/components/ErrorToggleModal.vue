@@ -56,17 +56,14 @@
     {
         code: ErrorToggleCodeEnum.LocationErr,
         title: 'Toggle Location Detect Fail',
-        msg: 'Please allow Anti Theft use your location'
+        msg: 'We currently do not support this mode'
     },
   ])
 
 
   watch(() => store.getters.getErrorToggleCode, async (newVal, oldVal) => {
-    console.log("getErrorToggleCode, ", newVal)
-    console.log(getErrorToggleCodeEnumList().includes(newVal))
     if (getErrorToggleCodeEnumList().includes(newVal)) {
         let e = errors.value.find((x) => x.code === newVal);
-        console.log('e:::', e);
         if (e) {
           open.value = true;
           title.value= e.title;

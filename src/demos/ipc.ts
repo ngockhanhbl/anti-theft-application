@@ -1,16 +1,16 @@
 import store from "../store/store"
 
 window.ipcRenderer.on('main-process-message', (_event, ...args) => {
-  console.log('[Receive Main-process message]:', ...args)
+  // console.log('[Receive Main-process message]:', ...args)
 })
 
 window.ipcRenderer.on('on-ac', (_event, ...args) => {
-  console.log('[Receive on-ac]:', ...args)
+  // console.log('[Receive on-ac]:', ...args)
   store.commit("setPowerReady", ...args)
 })
 
 window.ipcRenderer.on('open-change-password-popup', (_event, ...args) => {
-  console.log('[Receive open-change-password-popup]:', ...args)
+  // console.log('[Receive open-change-password-popup]:', ...args)
   store.dispatch('setChangePasswordModal', true)
 
   // store.dispatch('setChangePasswordModal', false);
@@ -25,12 +25,15 @@ window.ipcRenderer.on('open-history-popup', (_event, ...args) => {
   store.dispatch('setHistoryModal', true);
 })
 window.ipcRenderer.on('open-learn-alarm-popup', (_event, ...args) => {
-  console.log('[Receive open-learn-alarm-popup]:', ...args)
+  store.dispatch('setLearnAlarmModal', true);
 })
 
 window.ipcRenderer.on('audio-list', (_event, ...args) => {
-  console.log('Receive audio-list on',...args)
   store.dispatch('setAudioList', ...args);
+})
+window.ipcRenderer.on('audio-volume', (_event, ...args) => {
+  console.log('audio-volume', ...args);
+  store.dispatch('setAudioVolume', ...args);
 })
 
 // window.ipcRenderer.on('default-audio', (_event, ...args) => {
@@ -58,6 +61,18 @@ export async function addFile(file: File, fileName: string) {
     'buffer': fileBuffer,
     'fileName': fileName
   }).then((value: any) => {
+    return value;
+  })
+}
+
+export async function setAudioVolume(val: number) {
+  return window.ipcRenderer.invoke("set-audio-volume", val).then((value: any) => {
+    return value;
+  })
+}
+
+export async function setLidDoNothing() {
+  return window.ipcRenderer.invoke("set-lid-do-nothing").then((value: any) => {
     return value;
   })
 }

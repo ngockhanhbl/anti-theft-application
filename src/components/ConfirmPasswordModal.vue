@@ -9,10 +9,8 @@
 </template>
   
 <script setup lang="ts">
-  import { ref, computed, watch } from 'vue';
+  import { ref, watch } from 'vue';
   import { useStore } from 'vuex';
-  import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-  import { KeyIcon } from '@heroicons/vue/24/outline';
   import {DetectTheftEnum} from '../utils/constants';
   import AppModal from './modal/AppModal.vue';
 import { ISnackbar } from '../utils/interface_type';
@@ -56,8 +54,6 @@ import { ISnackbar } from '../utils/interface_type';
   }
 
   watch(() => store.state.visibleConfirmPasswordModal, async (newVal, oldVal) => {
-    console.log('store.state.visibleConfirmPasswordModal');
-    console.log(newVal);
     if (newVal) {
       open.value = true;
     } else {

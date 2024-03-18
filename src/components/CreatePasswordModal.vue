@@ -61,10 +61,8 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, computed, watch } from 'vue';
+  import { ref } from 'vue';
   import { useStore } from 'vuex';
-  import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-  import { KeyIcon } from '@heroicons/vue/24/outline';
   import { ISnackbar } from '../utils/interface_type';
 
   const open = ref(false);
