@@ -35,6 +35,13 @@ window.ipcRenderer.on('audio-volume', (_event, ...args) => {
   console.log('audio-volume', ...args);
   store.dispatch('setAudioVolume', ...args);
 })
+window.ipcRenderer.on('open-about-us', (_event, ...args) => {
+  store.dispatch('setAboutUsModal', true);
+})
+window.ipcRenderer.on('app-version', (_event, ...args) => {
+  store.dispatch('setAppVersion', ...args);
+})
+
 
 // window.ipcRenderer.on('default-audio', (_event, ...args) => {
 //   console.log('Receive audio on',...args)

@@ -43,7 +43,8 @@
             :value="item"
             color="primary"
             rounded="shaped"
-            :active="currentAudio == item"
+            :active="currentAudio === item"
+            @click="setCurrentAudio(item)"
           >
             <template v-slot:prepend>
               <v-icon icon="mdi-file-music"></v-icon>
@@ -51,7 +52,6 @@
 
             <v-list-item-title v-text="item"></v-list-item-title>
           </v-list-item>
-
 
           <v-list-subheader>Audio Volume</v-list-subheader>
           <v-list-item>
@@ -62,7 +62,8 @@
               :max="100"
               :min="0"
               :step="1"
-              @mouseup="mouseup"
+              @end="(value: number) => mouseup(value) "
+              class="px-3"
             ></v-slider>
           </v-list-item>
 
@@ -98,13 +99,13 @@
       return loading.value || !myAudioFile.value
     })
 
-    async function mouseup() {
-      let result = await setAudioVolume(audioVolume.value);
+    async function mouseup(value: number) {
+      let result = await setAudioVolume(value);
       if ( typeof result === 'number'  ) {
         store.dispatch("setAudioVolume", result)
       }
     }
-   
+
     function initAudioVolume() {
       audioVolume.value = store.getters.getAudioVolume ?? 0;
       setTimeout(() => {
@@ -113,6 +114,10 @@
     }
 
     initAudioVolume();
+
+    function setCurrentAudio(item: string) {
+      store.dispatch("setCurrentAudio", item);
+    }
 
     async function addAudio() {
       if (myAudioFile.value) {

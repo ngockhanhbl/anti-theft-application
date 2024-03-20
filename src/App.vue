@@ -6,6 +6,7 @@ import ChangePasswordModal from './components/ChangePasswordModal.vue';
 import Snackbar from './components/snackbar/Snackbar.vue';
 import InfoModal from './components/modal/InfoModal.vue';
 import HistoryModal from './components/HistoryModal.vue';
+import AboutUsModal from './components/AboutUsModal.vue';
 import AudioSettingsModal from './components/AudioSettingsModal.vue';
 import LearnAlarmModal from './components/LearnAlarmModal.vue';
 import {DetectTheftEnum} from './utils/constants';
@@ -44,7 +45,12 @@ function checkisShowWarning() {
   } else {
     try {
       let count = Number(total);
+      if ( typeof count !== 'number') {
+        return true;
+      }
+      localStorage.setItem("totalAppOpens", (count+1).toString());
       return (count > 20) ? false : true; 
+
     } catch(e) {
       return true;
     }
@@ -67,7 +73,6 @@ function stopAudio() {
 
 function setAudioVolume(val: number) {
   setTimeout(() => {
-    console.log(document.getElementById("myAudio"));
     if (document.getElementById("myAudio")) {
       document.getElementById("myAudio")!.volume = val;
     }
@@ -181,11 +186,11 @@ watch(() => store.getters.getAudioVolume, async (newVal, oldVal) => {
         <ConfirmPasswordModal />
         <ChangePasswordModal  />
         <HistoryModal />
+        <AboutUsModal />
         <AudioSettingsModal />
         <LearnAlarmModal />
         <Snackbar />
         <InfoModal />
-        {{ audioSrc }}
         <audio id="myAudio" ref="audioRef" controls loop preload="none" hidden>
           <source :src="audioSrc" type="audio/mpeg">
           <!-- <source src="./assets/audio/my_custom_audio.mp3" type="audio/mpeg"> -->

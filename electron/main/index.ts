@@ -10,7 +10,7 @@ import { exec } from 'node:child_process'
 // import {menu} from './menu';
 import * as loud from 'loudness';
 
-import * as koffi from 'koffi';
+// import * as koffi from 'koffi';
 
 
 globalThis.__filename = fileURLToPath(import.meta.url)
@@ -85,6 +85,7 @@ async function createWindow() {
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
     win?.webContents.send('on-ac', !powerMonitor.isOnBatteryPower())
+    win?.webContents.send('app-version', app.getVersion())
     handleSendAudioFiles(getAudioFiles(), true);
     sendAudioVolume()
   })

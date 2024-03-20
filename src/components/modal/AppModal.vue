@@ -1,15 +1,15 @@
 <template>
-    <div class="text-center">
+    <div class="text-center bg-red">
       <v-dialog
         v-model="open"
         width="auto"
-        @input="cancelClicked"
         :persistent='persistent'
       >
         <v-card
           :width="width"
           :prepend-icon="icon"
           :title=title
+          :color="bgColor"
           
           v-click-outside="outsideClicked"
         >
@@ -22,7 +22,7 @@
               v-if="useCancel"
               :text="cancelName"
               variant="text"
-              @click="cancelClicked"
+              @click.prevent="cancelClicked"
             ></v-btn>
 
             <v-btn
@@ -30,7 +30,7 @@
               :text="okName"
               color="green"
               variant="flat"
-              @click="okClicked"
+              @click.prevent="okClicked"
             ></v-btn>
           </template>
         </v-card>
@@ -38,8 +38,8 @@
     </div>
   </template>
     
-  <script setup lang="ts">
-  import { ref,} from 'vue';
+<script setup lang="ts">
+  import { ref} from 'vue';
   const emit = defineEmits(['okCallback', 'cancelCallback', 'outsideClicked'])
     const props = defineProps({
         open: { type: Boolean, default: false },
@@ -51,6 +51,7 @@
         icon: { type: String || null, default: null },
         persistent: { type: Boolean, default: false },
         width: { type: Number, default: 400 },
+        bgColor: { type: String || undefined, default: undefined },
     })
   
   const open = ref(props.open);
@@ -62,6 +63,7 @@
   const icon = ref(props.icon);
   const persistent = ref(props.persistent);
   const width = ref(props.width);
+  const bgColor = ref(props.bgColor);
 
   function okClicked() {
     emit("okCallback");

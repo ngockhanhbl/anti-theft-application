@@ -23,7 +23,8 @@ const store = createStore({
     currentAudio: '',
     audioVolume: -1,
     learnAlarmModal: false,
-
+    aboutUsModal: false,
+    appVersion: '',
     
   },
   getters: {
@@ -82,6 +83,13 @@ const store = createStore({
     getLearnAlarmModal(state) {
       return state.learnAlarmModal;
     },
+    getAboutUsModal(state) {
+      return state.aboutUsModal;
+    },
+    getAppVersion(state) {
+      return state.appVersion;
+    },
+    
   },
   mutations: {
     togglePowerMode (state, payload) {
@@ -149,6 +157,12 @@ const store = createStore({
     },
     setLearnAlarmModal(state, payload) {
       state.learnAlarmModal = payload;
+    },
+    setAboutUsModal(state, payload) {
+      state.aboutUsModal = payload;
+    },
+    setAppVersion(state, payload) {
+      state.appVersion = payload;
     },
   },
   actions: {
@@ -220,6 +234,14 @@ const store = createStore({
     setLearnAlarmModal(context, payload) {
       context.commit('setLearnAlarmModal', payload)
     },
+    setAboutUsModal(context, payload) {
+      context.commit('setAboutUsModal', payload)
+    },
+    setAppVersion(context, payload) {
+      context.commit('setAppVersion', payload)
+    },
+    
+    
   }
 })
 
