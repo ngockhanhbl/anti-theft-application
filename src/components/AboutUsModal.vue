@@ -17,8 +17,27 @@
           <div class="text-white">Version {{version}}</div>
         </div>
         <div class="w-50 wrap-center text-center">
-          <img src="../assets/companylogo.svg" class="company_logo"/>
-          <div class="text-center text-white">Khanh Nguyen</div>
+          <div class="d-flex flex-column justify-center ">
+            <div class="d-flex justify-center align-center">
+              <img src="../assets/companylogo.svg" class="company_logo"/>
+              <!-- <v-divider :vertical="true" color="white"  inset :thickness="2" class="mx-1 border-opacity-100" /> -->
+              <div class="mx-1">|</div>
+              <img src="../assets/vietnam.svg" class="vietnam_logo py-2"/>
+            </div> 
+            <div class="d-flex justify-center">
+              <v-btn
+                class="text-white text-none"
+                color="blue-darken-4"
+                rounded="0"
+                variant="flat"
+                @click="clickedContactUs"
+              >
+              Contact us
+            </v-btn>
+              
+            </div>
+          </div>
+          
         </div>
       </div>
     </v-card-text>
@@ -37,6 +56,10 @@
  
   function closeModal() {
     store.dispatch("setAboutUsModal", false);
+  }
+
+  function clickedContactUs() {
+    window.location.assign('mailto:nguyenngockhanhbl@gmail.com');
   }
 
   const version = computed(() => {
@@ -64,4 +87,8 @@
 .company_logo {
   width: 90%;
 }
+.vietnam_logo {
+  width: 45px;
+}
+
 </style>

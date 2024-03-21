@@ -32,7 +32,6 @@ window.ipcRenderer.on('audio-list', (_event, ...args) => {
   store.dispatch('setAudioList', ...args);
 })
 window.ipcRenderer.on('audio-volume', (_event, ...args) => {
-  console.log('audio-volume', ...args);
   store.dispatch('setAudioVolume', ...args);
 })
 window.ipcRenderer.on('open-about-us', (_event, ...args) => {

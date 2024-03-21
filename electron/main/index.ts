@@ -61,7 +61,10 @@ async function createWindow() {
     title: 'Main window',
     width: 1000,
     height: 750,
-    icon: join(process.env.VITE_PUBLIC, ''),
+    icon: `${__dirname}/dist/assets/logo.ico`,
+    //icon: join(process.env.VITE_PUBLIC, ''),
+    // resizable: false,
+    
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -157,7 +160,6 @@ async function getAudioVolume() {
 }
 async function setAudioVolume(value) {
   await getLoudnessInstance().setVolume(value);
-  getAudioVolume().then((val) => console.log("after set", val));
 }
 
 var audioFiles = []
@@ -211,10 +213,10 @@ const template = [
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
-        { role: 'forceReload' },
+        // { role: 'reload' },
+        // { role: 'forceReload' },
         // { role: 'toggleDevTools' },
-        { type: 'separator' },
+        // { type: 'separator' },
         { role: 'resetZoom' },
         { role: 'zoomIn' },
         { role: 'zoomOut' },
@@ -300,12 +302,12 @@ Menu.setApplicationMenu(menu);
 app.on('ready', () => {
   createWindow()
 
-  powerMonitor.on('suspend', () => {
-    // console.log('The system is going to sleep')
-  })
-  powerMonitor.on('resume', () => { 
-    // console.log('The system is resuming'); 
-  }); 
+  // powerMonitor.on('suspend', () => {
+  //   // console.log('The system is going to sleep')
+  // })
+  // powerMonitor.on('resume', () => { 
+  //   // console.log('The system is resuming'); 
+  // }); 
 
   powerMonitor.on('on-ac', () => { 
       // console.log('The system is on AC Power (charging)'); 
@@ -317,19 +319,18 @@ app.on('ready', () => {
       win?.webContents.send('on-ac', false)
   }); 
     
-  powerMonitor.on('shutdown', () => { 
-      // console.log('The system is Shutting Down'); 
-  }); 
+  // powerMonitor.on('shutdown', () => { 
+  //     // console.log('The system is Shutting Down'); 
+  // }); 
     
-  powerMonitor.on('lock-screen', () => { 
-      // console.log('The system is about to be locked'); 
-  }); 
+  // powerMonitor.on('lock-screen', () => { 
+  //     // console.log('The system is about to be locked'); 
+  // }); 
     
-  powerMonitor.on('unlock-screen', () => { 
-      // console.log('The system is unlocked'); 
-  });
+  // powerMonitor.on('unlock-screen', () => { 
+  //     // console.log('The system is unlocked'); 
+  // });
 
-  win?.webContents.send('open-change-password-popup');
 
 })
 

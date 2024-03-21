@@ -125,8 +125,8 @@
           loading.value = true;
 
           let result = await addFile(myAudioFile.value, fileName.value);
-          store.dispatch("setCurrentAudio", fileName.value);
           if (result) {
+          store.dispatch("setCurrentAudio", fileName.value);
             const snackbar: ISnackbar = {
               msg: 'Your custom audio has been successfully uploaded',
               open: true,
@@ -139,7 +139,7 @@
             }
             store.dispatch("setSnackbar", snackbar)
           }
-          file?.value?.reset();
+          ((file?.value) as any).reset();
         } catch(e) {
           // loading.value = false;
         } finally {

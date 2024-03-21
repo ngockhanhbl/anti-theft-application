@@ -64,17 +64,16 @@ onBeforeMount(() => {
 
 
 function playAudio() {
-  //HTMLVideoElement
-  document.getElementById("myAudio")?.play();
+  (document.getElementById("myAudio") as HTMLVideoElement)?.play();
 }
 function stopAudio() {
-  document.getElementById("myAudio")?.pause();
+  (document.getElementById("myAudio") as HTMLVideoElement)?.pause();
 }
 
 function setAudioVolume(val: number) {
   setTimeout(() => {
     if (document.getElementById("myAudio")) {
-      document.getElementById("myAudio")!.volume = val;
+      (document.getElementById("myAudio")! as HTMLVideoElement).volume = val;
     }
   }, 1000)
 }
