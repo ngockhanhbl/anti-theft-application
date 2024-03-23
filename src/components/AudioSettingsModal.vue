@@ -142,6 +142,11 @@
           ((file?.value) as any).reset();
         } catch(e) {
           // loading.value = false;
+          const snackbar: ISnackbar = {
+              msg: `Upload Failed`,
+              open: true,
+            }
+            store.dispatch("setSnackbar", snackbar)
         } finally {
           myAudioFile.value = null;
           fileName.value = '';

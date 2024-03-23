@@ -1,3 +1,3 @@
 export const getAudioAssetUrl = (name:string) => {
-    return new URL(`/src/assets/audio/${name}`, import.meta.url)
+    return new URL(`/public/audio/${name}`, import.meta.url)
 }

@@ -1,5 +1,7 @@
 {
   "name": "anti_theft",
+  "productName": "Anti Theft",
+  "author": "Ryan Tech Labs",
   "version": "1.0.0",
   "private": true,
   "description": "Anti Theft",
@@ -9,12 +11,45 @@
     "build": "vue-tsc --noEmit && vite build && electron-builder",
     "dev2": "vite",
     "dev": "npx electronmon .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:win": "npm run build && electron-builder --win --config",
+    "build:mac": "npm run build && electron-builder --mac --config",
+    "build:linux": "npm run build && electron-builder --linux --config"
   },
   "electronmon": {
-    "patterns": ["!src/assets/**"]
+    "patterns": ["!public/audio/**"]
   },
   "main": "dist-electron/main/index.js",
+  "build": {
+    "appId": "ryantechlabs.anti.theft",
+    "files": [
+      "dist",
+      "dist-electron",
+      "package.json",
+      "app/**/*",
+      "node_modules",
+      "dist-electron/main/index.js"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "win": {
+      "icon": "public/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "artifactName": "eDEX-UI-Windows-${arch}.exe",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true
+    }
+   
+  },
   "dependencies": {
     "@mdi/font": "5.9.55",
     "koffi": "^2.8.0",

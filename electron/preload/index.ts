@@ -2,7 +2,16 @@ import { ipcRenderer, contextBridge, powerMonitor } from 'electron';
 
 
 // --------- Expose some API to the Renderer process ---------
-contextBridge.exposeInMainWorld('ipcRenderer', withPrototype(ipcRenderer))
+contextBridge.exposeInMainWorld('ipcRenderer', 
+  {
+    ipcRenderer: {
+      ...ipcRenderer,
+      on: ipcRenderer.on.bind(ipcRenderer),
+      invoke: ipcRenderer.invoke.bind(ipcRenderer),
+      removeListener: ipcRenderer.removeListener.bind(ipcRenderer),
+    },
+  }
+)
 
 // `exposeInMainWorld` can't detect attributes and methods of `prototype`, manually patching it.
 function withPrototype(obj: Record<string, any>) {

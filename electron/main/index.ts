@@ -1,11 +1,10 @@
-import { app, BrowserWindow, shell, ipcMain, powerMonitor, Menu } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, powerMonitor, Menu, Tray } from 'electron'
 import { release } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { watch, readdirSync, writeFileSync, writeFile } from 'node:fs'
 
 import { exec } from 'node:child_process'
-
 
 // import {menu} from './menu';
 import * as loud from 'loudness';
@@ -61,10 +60,9 @@ async function createWindow() {
     title: 'Main window',
     width: 1000,
     height: 750,
-    icon: `${__dirname}/dist/assets/logo.ico`,
+    icon: join(__dirname, '../../public/logo.ico'),
     //icon: join(process.env.VITE_PUBLIC, ''),
     // resizable: false,
-    
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -81,6 +79,7 @@ async function createWindow() {
     // Open devTool if the app is not packaged
     win.webContents.openDevTools()
   } else {
+    // win.webContents.openDevTools()
     win.loadFile(indexHtml)
   }
 
@@ -150,14 +149,15 @@ async function sendAudioVolume() {
   win?.webContents.send('audio-volume', val)
 }
 
+function getAudioDir() {
+  return join(__dirname, '../../public/audio');
+}
+
 async function getAudioVolume() {
-  // console.log("koffi");
-  // const lib = koffi.load('powrprof.dll');
-
-
   let val = await getLoudnessInstance().getVolume();
   return val;
 }
+
 async function setAudioVolume(value) {
   await getLoudnessInstance().setVolume(value);
 }
@@ -165,10 +165,10 @@ async function setAudioVolume(value) {
 var audioFiles = []
 
 function getAudioFiles(): string[] {
-  return readdirSync(join(__dirname, '../../src/assets/audio'));
+  return readdirSync(getAudioDir());
 }
 
-watch(join(__dirname, '../../src/assets/audio'), (eventType, filename) => {
+watch(getAudioDir(), (eventType, filename) => {
   audioFiles = getAudioFiles();
   handleSendAudioFiles(audioFiles)
 })
@@ -362,7 +362,7 @@ ipcMain.handle('add-audio-file', (_, arg) => {
   if (!(buffer instanceof ArrayBuffer)) return false;
 
   return new Promise(function (resolve, reject) {
-    return writeFile(join(__dirname, `../../src/assets/audio/${fileName}`), Buffer.from(buffer), err => {
+    return writeFile(join(getAudioDir(), `${fileName}`), Buffer.from(buffer), err => {
       if (err) {
         resolve(false);
       } else {
